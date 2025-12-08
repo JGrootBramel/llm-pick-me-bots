@@ -1,5 +1,5 @@
 # Base: Ubuntu 20.04 + ROS 2 Foxy + Gazebo + RViz
-FROM osrf/ros:foxy-desktop-full
+FROM osrf/ros:foxy-desktop
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV ROS_DISTRO=foxy
