@@ -1,0 +1,58 @@
+# Base image: ROS 2 Humble with desktop tools
+FROM osrf/ros:humble-desktop
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV ROS_DISTRO=humble
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
+# Set user
+ARG USERNAME=ros
+RUN useradd -ms /bin/bash $USERNAME && \
+    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME
+
+# Install required packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    sudo \
+    build-essential \
+    git \
+    wget \
+    curl \
+    lsb-release \
+    gnupg2 \
+    nano \
+    python3-colcon-common-extensions \
+    python3-pip \
+    ros-${ROS_DISTRO}-xacro \
+    ros-${ROS_DISTRO}-gazebo-ros \
+    ros-${ROS_DISTRO}-joint-state-publisher-gui \
+    ros-${ROS_DISTRO}-robot-state-publisher \
+    ros-${ROS_DISTRO}-rviz2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create workspace
+USER $USERNAME
+WORKDIR /home/$USERNAME/limo_cobot_ws/src
+
+# Clone simulation and robot packages
+RUN git clone -b humble --depth 1 https://github.com/agilexrobotics/limo_ros2.git && \
+    git clone --depth 1 https://github.com/agilexrobotics/limo_cobot_sim.git && \
+    git clone --depth 1 https://github.com/elephantrobotics/mycobot_ros2.git
+
+# Fix any required permission
+WORKDIR /home/$USERNAME/limo_cobot_ws
+
+# Install dependencies
+RUN /bin/bash -lc "source /opt/ros/$ROS_DISTRO/setup.bash && \
+    rosdep update && \
+    rosdep install --from-paths src --ignore-src -r -y"
+
+# Build the workspace
+RUN /bin/bash -lc "source /opt/ros/$ROS_DISTRO/setup.bash && colcon build"
+
+# Source ROS setup and workspace on login
+RUN echo 'source /opt/ros/$ROS_DISTRO/setup.bash' >> /home/$USERNAME/.bashrc && \
+    echo 'source ~/limo_cobot_ws/install/setup.bash' >> /home/$USERNAME/.bashrc
+
+# Set working directory
+WORKDIR /home/$USERNAME/limo_cobot_ws
