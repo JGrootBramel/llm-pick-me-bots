@@ -39,9 +39,37 @@ RUN git clone -b humble --depth 1 https://github.com/agilexrobotics/limo_ros2.gi
     git clone --depth 1 https://github.com/agilexrobotics/limo_cobot_sim.git && \
     git clone --depth 1 https://github.com/elephantrobotics/mycobot_ros2.git
 
+# Remove duplicate packages
 RUN rm -rf \
     /home/ros/limo_cobot_ws/src/limo_ros2/limo_description \
     /home/ros/limo_cobot_ws/src/mycobot_ros2/mycobot_description
+
+# Remove known ROS 1 / incompatible packages
+RUN rm -rf \
+  src/mycobot_ros2/mycobot_description \
+  src/limo_cobot_sim/limo_mycobot/mycobot_description \
+  src/limo_cobot_sim/limo_mycobot/limo/limo_description \
+  src/limo_ros2/limo_description \
+  src/limo_cobot_sim/limo_gazebo_sim \
+  src/mycobot_ros2/mycobot_280_riscv \
+  src/mycobot_ros2/mycobot_280_x3pi \
+  src/mycobot_ros2/mycobot_280pi \
+  src/mycobot_ros2/mycobot_600 \
+  src/mycobot_ros2/mycobot_320pi \
+  src/mycobot_ros2/mycobot_pro_450 \
+  src/mycobot_ros2/mycobot_pro450_interfaces \
+  src/mycobot_ros2/mecharm \
+  src/mycobot_ros2/mybuddy \
+  src/mycobot_ros2/ultraarm
+
+# Install dependencies from ros-humble-desktop
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  ros-humble-joint-state-publisher-gui \
+  ros-humble-gazebo-ros-pkgs \
+  ros-humble-xacro \
+  ros-humble-rviz2 \
+  ros-humble-robot-state-publisher \
+  && rm -rf /var/lib/apt/lists/*
 
 # Fix any required permission
 WORKDIR /home/$USERNAME/limo_cobot_ws
