@@ -6,11 +6,6 @@ ENV ROS_DISTRO=humble
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 
-# Set user
-ARG USERNAME=ros
-RUN useradd -ms /bin/bash $USERNAME && \
-    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME
-
 # Install required packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     sudo \
@@ -70,6 +65,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   ros-humble-rviz2 \
   ros-humble-robot-state-publisher \
   && rm -rf /var/lib/apt/lists/*
+
+# Set user
+ARG USERNAME=ros
+RUN useradd -ms /bin/bash $USERNAME && \
+    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME
 
 # Fix any required permission
 WORKDIR /home/$USERNAME/limo_cobot_ws
