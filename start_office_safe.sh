@@ -14,7 +14,7 @@ if [ -f "/root/catkin_ws/devel/setup.bash" ]; then
 elif [ -f "$HOME/catkin_ws/devel/setup.bash" ]; then
     source $HOME/catkin_ws/devel/setup.bash
 else
-    echo "⚠️ WARNING: Could not find setup.bash automatically."
+    echo "WARNING: Could not find setup.bash automatically."
 fi
 
 # 3. DOWNLOAD TO HOME DIR (Fixes Permission Denied)
@@ -37,7 +37,7 @@ if [ -f "$WORLD_FILE" ]; then
     sed -i 's/<shadows>1<\/shadows>/<shadows>0<\/shadows>/g' "$WORLD_FILE"
     sed -i 's/<shadows>true<\/shadows>/<shadows>false<\/shadows>/g' "$WORLD_FILE"
 else
-    echo "❌ ERROR: World file not found at $WORLD_FILE"
+    echo " ERROR: World file not found at $WORLD_FILE"
     exit 1
 fi
 
@@ -60,7 +60,7 @@ if [ -z "$ROBOT_FILE" ]; then
 fi
 
 if [ -z "$ROBOT_FILE" ]; then
-    echo "❌ ERROR: Could not find limo_mycobot.xacro! Check your workspace."
+    echo " ERROR: Could not find limo_mycobot.xacro! Check your workspace."
 else
     echo ">>> Spawning Robot at X=2.0, Y=2.0..."
     rosparam set robot_description "$(xacro $ROBOT_FILE)"
@@ -77,5 +77,5 @@ fi
 
 roslaunch limo_cobot_gazebo limo_cobot_control.launch &
 
-echo "✅ DONE! Click PLAY (▶) in Gazebo."
+echo "DONE! Click PLAY (▶) in Gazebo."
 wait $GAZEBO_PID
