@@ -46,8 +46,8 @@ ENV ROSA_VENV=/opt/rosa-venv
 RUN python3.9 -m venv "${ROSA_VENV}" \
  && source "${ROSA_VENV}/bin/activate" \
  && pip install --upgrade pip \
- && pip install jpl-rosa \
- && pip install langchain-openai langchain-google-genai langchain-core
+ && pip install -U jpl-rosa \
+ && pip install langchain-openai langchain-google-genai langchain-core python-dotenv
 
 # --------------------------------------------------------------------------
 # Initialize rosdep
@@ -85,6 +85,11 @@ RUN source /opt/ros/noetic/setup.bash \
 RUN echo "source /opt/ros/noetic/setup.bash" >> /root/.bashrc \
  && echo "source /root/catkin_ws/devel/setup.bash" >> /root/.bashrc \
  && echo "source ${ROSA_VENV}/bin/activate" >> /root/.bashrc
+
+# --------------------------------------------------------------------------
+# Set PYTHONPATH for ROSA tools
+# --------------------------------------------------------------------------
+ ENV PYTHONPATH=/src/tools:${PYTHONPATH}
 
 # --------------------------------------------------------------------------
 # Force software rendering for OpenGL in container (Gazebo & RViz)
