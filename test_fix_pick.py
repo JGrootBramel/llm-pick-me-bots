@@ -98,15 +98,34 @@ def rotate_angle(degrees: float) -> str:
 
 @tool
 def detect_box(color: str) -> str:
-    """Detect blue or red box"""
-    time.sleep(1)
+    """
+    Detect blue or red box using ROS vision topic.
+    """
+    result = {"found": False}
 
-    if color.lower() == "blue":
-        return "Blue box detected at 1.2 meters, angle -8 degrees"
-    if color.lower() == "red":
-        return "Red box detected at 0.9 meters, angle 5 degrees"
+    def callback(msg):
+        data = json.loads(msg["data"])
+        if data["color"] == color.lower():
+            result["found"] = True
+            result["distance"] = data["distance"]
+            result["angle"] = data["angle"]
 
-    return "Box not found"
+    sub = roslibpy.Topic(client, "/box_detection", "std_msgs/String")
+    sub.subscribe(callback)
+
+    timeout = time.time() + 3
+    while time.time() < timeout:
+        if result["found"]:
+            sub.unsubscribe()
+            return (
+                f"{color.capitalize()} box detected at "
+                f"{result['distance']} meters, "
+                f"angle {result['angle']} degrees"
+            )
+        time.sleep(0.1)
+
+    sub.unsubscribe()
+    return f"{color.capitalize()} box not found"
 
 
 @tool
